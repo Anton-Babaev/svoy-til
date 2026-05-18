@@ -1,9 +1,36 @@
+# Виртуальное окружение
 venv/
+env/
+.env
+
+# Кэш Python
 __pycache__/
 *.pyc
-*.log
-.env
-media/
-staticfiles/
+*.pyo
+*.pyd
+
+# База данных
 db.sqlite3
+*.sqlite3
+
+# Статика и медиа (собранные файлы)
+staticfiles/
+media/
+
+# Файлы с секретами
+.env
+.secret
+
+# Логи
+*.log
+
+# Настройки IDE
+.vscode/
+.idea/
+
+# Файлы Windows
+Thumbs.db
+desktop.ini
+
+# Файлы macOS
 .DS_Store
