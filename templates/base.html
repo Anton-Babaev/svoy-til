@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Свой Тыл - Ассоциация{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS (через CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Наши стили (будут позже) -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+    <!-- Хедер (шапка) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <!-- Логотип (пока заглушка) -->
+            <a class="navbar-brand" href="/">
+                {% load static %}
+                <img src="{% static 'images/logo-placeholder.png' %}" alt="Логотип" height="40" class="d-inline-block align-text-top me-2">
+                Свой Тыл
+            </a>
+            
+            <!-- Кнопка гамбургера для мобильных -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Меню -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about/">О нас</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/news/">Новости</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/projects/">Проекты</a>
+                    </li>
+                </ul>
+                
+                <!-- Правая часть меню (вход/личный кабинет) -->
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/profile/">Личный кабинет</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/accounts/logout/">Выйти</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/accounts/login/">Вход</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/accounts/register/">Регистрация</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main>
+        <div class="container my-4">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Футер (подвал) -->
+    <footer class="bg-dark text-white mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Ассоциация "Свой Тыл"</h5>
+                    <p>Поддержка предпринимателей</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>Контакты: info@svoy-tyl.ru</p>
+                    <p>© 2026 Все права защищены</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS (для работы гамбургера) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
