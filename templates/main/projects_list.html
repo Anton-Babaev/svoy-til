@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Проекты - Свой Тыл{% endblock %}
+
+{% block extra_css %}
+<style>
+    .projects-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+    
+    .project-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    
+    .project-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .project-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+    }
+    
+    .project-status {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        background: rgba(255,255,255,0.2);
+    }
+    
+    .project-dates {
+        font-size: 14px;
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="projects-header">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Наши проекты</h1>
+        <p class="lead">Проекты, направленные на поддержку ветеранов и их семей</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        {% for project in projects %}
+            <div class="col-md-6 col-lg-4">
+                <div class="project-card">
+                    <div class="project-header">
+                        <h5 class="mb-2">{{ project.title }}</h5>
+                        <span class="project-status">
+                            {% if project.is_active %}Активен{% else %}Завершен{% endif %}
+                        </span>
+                        <div class="project-dates">
+                            <i class="bi bi-calendar3"></i> 
+                            {{ project.start_date|date:"d.m.Y" }} - 
+                            {% if project.end_date %}{{ project.end_date|date:"d.m.Y" }}{% else %}по настоящее время{% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <p class="text-muted">{{ project.description|truncatewords:30 }}</p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> Проектов пока нет
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

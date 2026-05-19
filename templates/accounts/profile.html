@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Личный кабинет - Свой Тыл{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: calc(100vh - 200px);
+        padding: 40px 0;
+    }
+    
+    .profile-card {
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+        border: none;
+    }
+    
+    .card-header-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        text-align: center;
+        color: white;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .status-pending {
+        background: #ffc107;
+        color: #856404;
+    }
+    
+    .status-active {
+        background: #28a745;
+        color: white;
+    }
+    
+    .status-blocked {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .info-box {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 12px 30px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card profile-card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-person-circle" style="font-size: 48px;"></i>
+                        <h5 class="mt-2">{{ member.company_name }}</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="text-center mb-3">
+                            <span class="status-badge status-{{ member.status }}">
+                                {% if member.status == 'pending' %}
+                                    <i class="bi bi-clock-history"></i> На модерации
+                                {% elif member.status == 'active' %}
+                                    <i class="bi bi-check-circle"></i> Активен
+                                {% else %}
+                                    <i class="bi bi-ban"></i> Заблокирован
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">Категория членства</small>
+                            <p class="mb-0 fw-bold">{{ member.get_membership_category_display }}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">Дата регистрации</small>
+                            <p class="mb-0">{{ member.created_at|date:"d.m.Y H:i" }}</p>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger">
+                                <i class="bi bi-box-arrow-right"></i> Выйти
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card profile-card">
+                    <div class="card-header-custom">
+                        <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Редактирование профиля</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        
+                        {% if member.status == 'pending' %}
+                            <div class="info-box">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>Ваша заявка на модерации</strong><br>
+                                Мы рассматриваем вашу заявку. О результате вы получите уведомление на email.
+                                Пока модерация не пройдена, редактирование данных недоступно.
+                            </div>
+                        {% elif member.status == 'active' %}
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label fw-bold">Название организации</label>
+                                        <input type="text" name="company_name" class="form-control" value="{{ member.company_name }}" required>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Email</label>
+                                        <input type="email" class="form-control" value="{{ member.email }}" disabled>
+                                        <div class="form-text">Email нельзя изменить</div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Телефон</label>
+                                        <input type="text" name="phone" class="form-control" value="{{ member.phone }}" required>
+                                    </div>
+                                    
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label fw-bold">Юридический адрес</label>
+                                        <textarea name="legal_address" class="form-control" rows="2" required>{{ member.legal_address }}</textarea>
+                                    </div>
+                                    
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label fw-bold">Фактический адрес</label>
+                                        <textarea name="actual_address" class="form-control" rows="2">{{ member.actual_address|default:'' }}</textarea>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">ФИО руководителя</label>
+                                        <input type="text" name="director_fullname" class="form-control" value="{{ member.director_fullname }}" required>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">ИНН</label>
+                                        <input type="text" class="form-control" value="{{ member.inn }}" disabled>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-save text-white">
+                                    <i class="bi bi-save"></i> Сохранить изменения
+                                </button>
+                            </form>
+                        {% else %}
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Ваш аккаунт заблокирован. Для выяснения причин обратитесь к администратору.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

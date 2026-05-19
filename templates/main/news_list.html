@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Новости - Свой Тыл{% endblock %}
+
+{% block extra_css %}
+<style>
+    .news-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+    
+    .news-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    
+    .news-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .news-date {
+        color: #667eea;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    
+    .news-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .news-title a {
+        color: #333;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .news-title a:hover {
+        color: #667eea;
+    }
+    
+    .news-excerpt {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+    
+    .read-more {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+    
+    .read-more:hover {
+        color: #764ba2;
+    }
+    
+    .pagination {
+        margin-top: 30px;
+    }
+    
+    .page-link {
+        color: #667eea;
+        border-radius: 8px;
+        margin: 0 3px;
+    }
+    
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="news-header">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Новости ассоциации</h1>
+        <p class="lead">Будьте в курсе последних событий и новостей</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            {% for news_item in news %}
+                <div class="card news-card">
+                    <div class="card-body p-4">
+                        <div class="news-date">
+                            <i class="bi bi-calendar3"></i> {{ news_item.published_at|date:"d.m.Y H:i" }}
+                        </div>
+                        <h2 class="news-title">
+                            <a href="{% url 'news_detail' news_item.id %}">{{ news_item.title }}</a>
+                        </h2>
+                        <div class="news-excerpt">
+                            {{ news_item.content|truncatewords:50|safe }}
+                        </div>
+                        <a href="{% url 'news_detail' news_item.id %}" class="read-more">
+                            Читать далее <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> Новостей пока нет
+                </div>
+            {% endfor %}
+            
+            <!-- Пагинация -->
+            {% if news.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if news.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ news.previous_page_number }}">
+                                    <i class="bi bi-chevron-left"></i> Назад
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in news.paginator.page_range %}
+                            {% if news.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if news.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ news.next_page_number }}">
+                                    Вперед <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

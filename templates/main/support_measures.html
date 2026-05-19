@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Меры поддержки - Свой Тыл{% endblock %}
+
+{% block extra_css %}
+<style>
+    .support-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+    
+    .measure-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        transition: transform 0.3s;
+    }
+    
+    .measure-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .measure-icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    
+    .measure-icon i {
+        font-size: 30px;
+        color: white;
+    }
+    
+    .btn-download {
+        background: #667eea;
+        color: white;
+        border-radius: 8px;
+        padding: 5px 15px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .btn-download:hover {
+        background: #764ba2;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="support-header">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Меры поддержки</h1>
+        <p class="lead">Доступные программы и льготы для членов ассоциации</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {% for measure in measures %}
+                <div class="card measure-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-start">
+                            <div class="measure-icon flex-shrink-0">
+                                <i class="bi bi-file-text"></i>
+                            </div>
+                            <div class="ms-3 flex-grow-1">
+                                <h4>{{ measure.title }}</h4>
+                                <p class="text-muted">{{ measure.description }}</p>
+                                <div class="text-muted small mb-3">
+                                    <i class="bi bi-calendar3"></i> Добавлено: {{ measure.created_at|date:"d.m.Y" }}
+                                </div>
+                                {% if measure.document %}
+                                    <a href="{{ measure.document.url }}" class="btn-download text-decoration-none" target="_blank">
+                                        <i class="bi bi-download"></i> Скачать документ
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="alert alert-info text-center">
+                    <i class="bi bi-info-circle"></i> Меры поддержки временно недоступны
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

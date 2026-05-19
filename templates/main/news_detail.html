@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ news.title }} - Свой Тыл{% endblock %}
+
+{% block extra_css %}
+<style>
+    .news-detail-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+    
+    .news-content {
+        font-size: 18px;
+        line-height: 1.8;
+        color: #333;
+    }
+    
+    .news-content p {
+        margin-bottom: 20px;
+    }
+    
+    .news-meta {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .sidebar-card {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .sidebar-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+    }
+    
+    .other-news-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .other-news-item:last-child {
+        border-bottom: none;
+    }
+    
+    .other-news-title {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+    
+    .other-news-title a {
+        color: #333;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .other-news-title a:hover {
+        color: #667eea;
+    }
+    
+    .other-news-date {
+        font-size: 12px;
+        color: #999;
+    }
+    
+    .back-button {
+        margin-bottom: 20px;
+    }
+    
+    .btn-back {
+        background: #667eea;
+        color: white;
+        border-radius: 8px;
+        padding: 8px 20px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #764ba2;
+        color: white;
+        transform: translateX(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="news-detail-header">
+    <div class="container">
+        <div class="back-button">
+            <a href="{% url 'news_list' %}" class="btn btn-back">Ко всем новостям</a>
+        </div>
+        <h1 class="display-5 fw-bold">{{ news.title }}</h1>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="news-meta">
+                <i class="bi bi-calendar3"></i> {{ news.published_at|date:"d.m.Y H:i" }}
+            </div>
+            
+            <div class="news-content">
+                {{ news.content|safe|linebreaks }}
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            {% if other_news %}
+                <div class="sidebar-card">
+                    <div class="sidebar-title">
+                        <i class="bi bi-newspaper"></i> Читайте также
+                    </div>
+                    {% for other in other_news %}
+                        <div class="other-news-item">
+                            <div class="other-news-title">
+                                <a href="{% url 'news_detail' other.id %}">{{ other.title|truncatechars:60 }}</a>
+                            </div>
+                            <div class="other-news-date">
+                                <i class="bi bi-calendar3"></i> {{ other.published_at|date:"d.m.Y" }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <div class="sidebar-card">
+                <div class="sidebar-title">
+                    <i class="bi bi-info-circle"></i> Информация
+                </div>
+                <p class="small">
+                    По вопросам сотрудничества и участия в мероприятиях обращайтесь к нам по телефону 
+                    или электронной почте.
+                </p>
+                <hr>
+                <div class="small">
+                    <i class="bi bi-envelope"></i> info@svoy-tyl.ru<br>
+                    <i class="bi bi-telephone"></i> +7 (XXX) XXX-XX-XX
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
