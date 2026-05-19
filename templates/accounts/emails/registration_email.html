@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .content { padding: 30px; background: #f9f9f9; }
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Ассоциация "Свой Тыл"</h2>
+        </div>
+        <div class="content">
+            <h3>Уважаемый(ая) {{ member.director_fullname }}!</h3>
+            
+            <p>Ваша заявка на вступление в ассоциацию <strong>"Свой Тыл"</strong> успешно зарегистрирована.</p>
+            
+            <h4>Данные заявки:</h4>
+            <ul>
+                <li><strong>Организация:</strong> {{ member.company_name }}</li>
+                <li><strong>Email:</strong> {{ member.email }}</li>
+                <li><strong>Статус:</strong> На модерации</li>
+            </ul>
+            
+            <p>Мы рассмотрим вашу заявку в ближайшее время и сообщим о решении.</p>
+            
+            <p>С уважением,<br>Администрация ассоциации "Свой Тыл"</p>
+        </div>
+        <div class="footer">
+            <p>© 2025 Ассоциация "Свой Тыл"</p>
+        </div>
+    </div>
+</body>
+</html>

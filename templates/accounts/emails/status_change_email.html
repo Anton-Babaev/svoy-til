@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .content { padding: 30px; background: #f9f9f9; }
+        .status-badge { display: inline-block; padding: 5px 10px; border-radius: 5px; color: white; font-weight: bold; }
+        .status-active { background: #28a745; }
+        .status-blocked { background: #dc3545; }
+        .status-pending { background: #ffc107; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Ассоциация "Свой Тыл"</h2>
+        </div>
+        <div class="content">
+            <h3>Уважаемый(ая) {{ member.director_fullname }}!</h3>
+            
+            <p>Статус вашей заявки изменен:</p>
+            
+            <p>
+                <strong>Было:</strong> {{ old_status }}<br>
+                <strong>Стало:</strong> 
+                {% if new_status == 'активен' %}
+                    <span class="status-badge status-active">{{ new_status }}</span>
+                {% elif new_status == 'заблокирован' %}
+                    <span class="status-badge status-blocked">{{ new_status }}</span>
+                {% else %}
+                    <span class="status-badge status-pending">{{ new_status }}</span>
+                {% endif %}
+            </p>
+            
+            {% if new_status == 'активен' %}
+                <p>Поздравляем! Вы стали полноправным членом ассоциации. Теперь вам доступен полный функционал личного кабинета.</p>
+            {% elif new_status == 'заблокирован' %}
+                <p>К сожалению, ваша заявка отклонена. Для получения подробной информации свяжитесь с администрацией.</p>
+            {% else %}
+                <p>Ваша заявка находится на рассмотрении. Мы свяжемся с вами в ближайшее время.</p>
+            {% endif %}
+            
+            <p>С уважением,<br>Администрация ассоциации "Свой Тыл"</p>
+        </div>
+        <div class="footer">
+            <p>© 2025 Ассоциация "Свой Тыл"</p>
+        </div>
+    </div>
+</body>
+</html>

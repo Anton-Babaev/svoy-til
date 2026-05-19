@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from .forms import MemberRegistrationForm
+from .utils import send_registration_email, send_admin_notification
 from members.models import Member
 from django.contrib.auth.models import User
 
@@ -21,14 +22,23 @@ def register(request):
             # Создаем члена ассоциации
             member = form.save(commit=False)
             member.user = user
-            member.status = 'pending'  # На модерации
+            member.status = 'pending'
             member.save()
+            
+            # Отправляем email уведомления
+            try:
+                send_registration_email(user, member, request)
+                send_admin_notification(member, request)
+                messages.success(request, 'Регистрация успешно завершена! Письмо с подтверждением отправлено на ваш email.')
+            except Exception as e:
+                print(f"Email error: {e}")
+                messages.warning(request, 'Регистрация прошла успешно, но не удалось отправить email уведомление.')
             
             # Автоматически входим в систему
             login(request, user)
             
             messages.success(request, 'Регистрация успешно завершена! Ваша заявка отправлена на модерацию.')
-            return redirect('accounts:profile')  # Добавили accounts:
+            return redirect('accounts:profile')
     else:
         form = MemberRegistrationForm()
     
@@ -52,6 +62,9 @@ def profile(request):
         member.phone = request.POST.get('phone', member.phone)
         member.save()
         messages.success(request, 'Данные успешно обновлены!')
-        return redirect('accounts:profile')  # Добавили accounts:
+        return redirect('accounts:profile')
     
-    return render(request, 'accounts/profile.html', {'member': member})
+    context = {
+        'member': member,
+    }
+    return render(request, 'accounts/profile.html', context)
