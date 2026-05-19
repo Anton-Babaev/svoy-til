@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Мероприятия - Свой Тыл{% endblock %}
+
+{% block extra_css %}
+<style>
+    .events-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+    
+    .event-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    
+    .event-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .event-date {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        min-width: 100px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .event-day {
+        font-size: 32px;
+        font-weight: bold;
+        line-height: 1;
+    }
+    
+    .event-month {
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+    
+    .event-time {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    
+    .event-status {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .status-registration-open {
+        background: #28a745;
+        color: white;
+    }
+    
+    .status-registration-closed {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .status-full {
+        background: #ffc107;
+        color: #333;
+    }
+    
+    .event-image-sm {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="events-header">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Мероприятия</h1>
+        <p class="lead">Участвуйте в мероприятиях ассоциации</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <!-- Предстоящие мероприятия -->
+    <h2 class="mb-4">Предстоящие мероприятия</h2>
+    {% if upcoming_events %}
+        <div class="row">
+            {% for event in upcoming_events %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card event-card h-100">
+                        <div class="row g-0 h-100">
+                            {% if event.image %}
+                                <div class="col-4">
+                                    <img src="{{ event.image.url }}" alt="{{ event.title }}" class="event-image-sm">
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ event.title }}</h5>
+                                        <p class="card-text small text-muted">
+                                            <i class="bi bi-geo-alt"></i> {{ event.location }}
+                                        </p>
+                                        <p class="card-text small">{{ event.short_description|truncatewords:15 }}</p>
+                                        <p class="card-text small">
+                                            <i class="bi bi-calendar"></i> {{ event.start_date|date:"d.m.Y H:i" }}
+                                        </p>
+                                        {% if event.is_registration_open %}
+                                            <span class="event-status status-registration-open">Регистрация открыта</span>
+                                        {% else %}
+                                            <span class="event-status status-registration-closed">Регистрация закрыта</span>
+                                        {% endif %}
+                                        <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-outline-primary mt-2 w-100">
+                                            Подробнее
+                                        </a>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="col-4">
+                                    <div class="event-date">
+                                        <div class="event-day">{{ event.start_date|date:"d" }}</div>
+                                        <div class="event-month">{{ event.start_date|date:"M"|upper }}</div>
+                                        <div class="event-time">{{ event.start_date|date:"H:i" }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ event.title }}</h5>
+                                        <p class="card-text small text-muted">
+                                            <i class="bi bi-geo-alt"></i> {{ event.location }}
+                                        </p>
+                                        <p class="card-text small">{{ event.short_description|truncatewords:15 }}</p>
+                                        {% if event.is_registration_open %}
+                                            <span class="event-status status-registration-open">Регистрация открыта</span>
+                                        {% else %}
+                                            <span class="event-status status-registration-closed">Регистрация закрыта</span>
+                                        {% endif %}
+                                        <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-outline-primary mt-2 w-100">
+                                            Подробнее
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            <i class="bi bi-calendar2-week"></i> На данный момент нет предстоящих мероприятий
+        </div>
+    {% endif %}
+    
+    <!-- Прошедшие мероприятия -->
+    {% if past_events %}
+        <hr class="my-5">
+        <h2 class="mb-4">Прошедшие мероприятия</h2>
+        <div class="row">
+            {% for event in past_events %}
+                <div class="col-md-4 mb-4">
+                    <div class="card event-card h-100">
+                        {% if event.image %}
+                            <img src="{{ event.image.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 150px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <small class="text-muted">{{ event.start_date|date:"d.m.Y H:i" }}</small>
+                            <h5 class="mt-2">{{ event.title }}</h5>
+                            <p class="small text-muted">{{ event.location }}</p>
+                            <a href="{% url 'event_detail' event.id %}" class="btn btn-sm btn-outline-secondary w-100">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

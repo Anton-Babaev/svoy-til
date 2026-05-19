@@ -3,41 +3,170 @@
 
 {% block title %}Вход - Свой Тыл{% endblock %}
 
+{% block extra_css %}
+<style>
+    .login-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: calc(100vh - 200px);
+        padding: 60px 0;
+    }
+    
+    .login-card {
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+        border: none;
+    }
+    
+    .card-header-custom {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        text-align: center;
+        color: white;
+    }
+    
+    .card-header-custom h3 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+    }
+    
+    .card-header-custom p {
+        margin: 10px 0 0;
+        opacity: 0.9;
+    }
+    
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        padding: 12px 15px;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 8px;
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 12px 30px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: all 0.3s;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .forgot-password {
+        color: #667eea;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .forgot-password:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+    
+    .register-link {
+        color: #667eea;
+        font-weight: 600;
+        text-decoration: none;
+    }
+    
+    .register-link:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Вход в личный кабинет</h3>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        {% if form.errors %}
-                            <div class="alert alert-danger">
-                                Неверное имя пользователя или пароль
+<div class="login-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card login-card">
+                    <div class="card-header-custom">
+                        <i class="bi bi-person-circle" style="font-size: 48px;"></i>
+                        <h3 class="mt-2">Добро пожаловать!</h3>
+                        <p>Войдите в личный кабинет</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    Неверный email или пароль. Пожалуйста, попробуйте снова.
+                                </div>
+                            {% endif %}
+                            
+                            <div class="mb-3">
+                                <label for="id_username" class="form-label">
+                                    <i class="bi bi-envelope"></i> Email
+                                </label>
+                                <input type="email" name="username" id="id_username" 
+                                       class="form-control" placeholder="example@mail.ru" required>
+                                <div class="form-text">Введите email, указанный при регистрации</div>
                             </div>
-                        {% endif %}
+                            
+                            <div class="mb-3">
+                                <label for="id_password" class="form-label">
+                                    <i class="bi bi-lock"></i> Пароль
+                                </label>
+                                <input type="password" name="password" id="id_password" 
+                                       class="form-control" placeholder="••••••••" required>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" name="remember_me" id="remember_me" class="form-check-input">
+                                <label for="remember_me" class="form-check-label">Запомнить меня</label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-login text-white w-100">
+                                <i class="bi bi-box-arrow-in-right"></i> Войти
+                            </button>
+                        </form>
                         
-                        <div class="mb-3">
-                            <label for="id_username" class="form-label">Email</label>
-                            <input type="email" name="username" id="id_username" class="form-control" required>
+                        <hr class="my-4">
+                        
+                        <div class="text-center mb-2">
+                            <a href="{% url 'accounts:password_reset' %}" class="forgot-password">
+                                <i class="bi bi-key"></i> Забыли пароль?
+                            </a>
                         </div>
                         
-                        <div class="mb-3">
-                            <label for="id_password" class="form-label">Пароль</label>
-                            <input type="password" name="password" id="id_password" class="form-control" required>
+                        <div class="text-center">
+                            <p class="mb-0">
+                                Еще нет аккаунта? 
+                                <a href="{% url 'accounts:register' %}" class="register-link">
+                                    Зарегистрироваться
+                                </a>
+                            </p>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary w-100">Войти</button>
-                    </form>
-                    
-                    <hr>
-                    
-                    <div class="text-center">
-                        <p>Еще нет аккаунта? <a href="{% url 'accounts:register' %}">Зарегистрироваться</a></p>
+                        <hr class="my-4">
+                        
+                        <div class="text-center">
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i>
+                                После регистрации ваша заявка будет рассмотрена администратором
+                            </small>
+                        </div>
                     </div>
                 </div>
             </div>

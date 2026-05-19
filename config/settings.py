@@ -184,3 +184,7 @@ LOGGING = {
 
 # Для красивого отображения кириллического домена в письмах
 DEFAULT_FROM_EMAIL = 'Ассоциация "Свой Тыл" <babaev@xn----ctbvjmql6e.xn--p1ai>'
+
+# Настройки для восстановления пароля
+PASSWORD_RESET_TIMEOUT = 86400  # 24 часа в секундах
+EMAIL_SUBJECT_PREFIX = '[Свой Тыл] '
