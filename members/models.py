@@ -123,6 +123,36 @@ class Member(models.Model):
         verbose_name='Дата следующего платежа'
     )
 
+    # Документы
+    charter_document = models.FileField(
+        upload_to='documents/',
+        blank=True,
+        null=True,
+        verbose_name='Устав организации (PDF)',
+        help_text='Загрузите устав организации в формате PDF'
+    )
+    ogrn_document = models.FileField(
+        upload_to='documents/',
+        blank=True,
+        null=True,
+        verbose_name='Свидетельство ОГРН (PDF)',
+        help_text='Свидетельство о государственной регистрации'
+    )
+    inn_document = models.FileField(
+        upload_to='documents/',
+        blank=True,
+        null=True,
+        verbose_name='Свидетельство ИНН (PDF)',
+        help_text='Свидетельство о постановке на учет в налоговом органе'
+    )
+    additional_document = models.FileField(
+        upload_to='documents/',
+        blank=True,
+        null=True,
+        verbose_name='Дополнительный документ (PDF)',
+        help_text='Любые дополнительные документы'
+    )
+
     class Meta:
         verbose_name = 'Член ассоциации'
         verbose_name_plural = 'Члены ассоциации'
@@ -132,6 +162,7 @@ class Member(models.Model):
         return f"{self.company_name} ({self.get_status_display()})"
 
 
+# Сигналы временно отключены (работаем через админку)
 # @receiver(post_save, sender=User)
 # def create_user_member(sender, instance, created, **kwargs):
 #     """Автоматически создаёт профиль члена при создании пользователя"""
@@ -146,4 +177,3 @@ class Member(models.Model):
 #         instance.member.save()
 #     except Member.DoesNotExist:
 #         Member.objects.create(user=instance, email=instance.username)
-        

@@ -63,6 +63,43 @@
         font-size: 16px;
         font-weight: 600;
         border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .document-link {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        transition: all 0.3s;
+    }
+    
+    .document-link:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+    }
+    
+    .document-link i {
+        font-size: 24px;
+        margin-right: 10px;
+        color: #dc3545;
+    }
+    
+    .document-link a {
+        text-decoration: none;
+        color: #333;
+        flex: 1;
+    }
+    
+    .document-link a:hover {
+        color: #667eea;
     }
 </style>
 {% endblock %}
@@ -76,6 +113,7 @@
                     <div class="card-header-custom">
                         <i class="bi bi-person-circle" style="font-size: 48px;"></i>
                         <h5 class="mt-2">{{ member.company_name }}</h5>
+                        <p class="mb-0 small">{{ member.email }}</p>
                     </div>
                     <div class="card-body p-4">
                         <div class="text-center mb-3">
@@ -102,12 +140,22 @@
                             <p class="mb-0">{{ member.created_at|date:"d.m.Y H:i" }}</p>
                         </div>
                         
+                        {% if member.next_payment_date %}
+                            <div class="mb-3">
+                                <small class="text-muted">Дата следующего платежа</small>
+                                <p class="mb-0">{{ member.next_payment_date|date:"d.m.Y" }}</p>
+                            </div>
+                        {% endif %}
+                        
                         <hr>
                         
                         <div class="d-grid gap-2">
-                            <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger">
-                                <i class="bi bi-box-arrow-right"></i> Выйти
-                            </a>
+                            <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="bi bi-box-arrow-right"></i> Выйти
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -135,8 +183,13 @@
                                 Мы рассматриваем вашу заявку. О результате вы получите уведомление на email.
                                 Пока модерация не пройдена, редактирование данных недоступно.
                             </div>
+                            
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Для ускорения процесса проверки вы можете загрузить необходимые документы.
+                            </div>
                         {% elif member.status == 'active' %}
-                            <form method="post">
+                            <form method="post" enctype="multipart/form-data">
                                 {% csrf_token %}
                                 
                                 <div class="row">
@@ -185,6 +238,64 @@
                             <div class="alert alert-danger">
                                 <i class="bi bi-exclamation-triangle"></i>
                                 Ваш аккаунт заблокирован. Для выяснения причин обратитесь к администратору.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Блок документов -->
+                <div class="card profile-card mt-4">
+                    <div class="card-header-custom">
+                        <h5 class="mb-0"><i class="bi bi-files"></i> Загруженные документы</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if member.charter_document %}
+                            <div class="document-link">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                                <a href="{{ member.charter_document.url }}" target="_blank">
+                                    Устав организации
+                                </a>
+                                <small class="text-muted">{{ member.charter_document.size|filesizeformat }}</small>
+                            </div>
+                        {% endif %}
+                        
+                        {% if member.ogrn_document %}
+                            <div class="document-link">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                                <a href="{{ member.ogrn_document.url }}" target="_blank">
+                                    Свидетельство ОГРН
+                                </a>
+                                <small class="text-muted">{{ member.ogrn_document.size|filesizeformat }}</small>
+                            </div>
+                        {% endif %}
+                        
+                        {% if member.inn_document %}
+                            <div class="document-link">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                                <a href="{{ member.inn_document.url }}" target="_blank">
+                                    Свидетельство ИНН
+                                </a>
+                                <small class="text-muted">{{ member.inn_document.size|filesizeformat }}</small>
+                            </div>
+                        {% endif %}
+                        
+                        {% if member.additional_document %}
+                            <div class="document-link">
+                                <i class="bi bi-file-earmark-pdf"></i>
+                                <a href="{{ member.additional_document.url }}" target="_blank">
+                                    Дополнительный документ
+                                </a>
+                                <small class="text-muted">{{ member.additional_document.size|filesizeformat }}</small>
+                            </div>
+                        {% endif %}
+                        
+                        {% if not member.charter_document and not member.ogrn_document and not member.inn_document %}
+                            <div class="text-center py-4">
+                                <i class="bi bi-file-earmark-text" style="font-size: 48px; color: #ccc;"></i>
+                                <p class="text-muted mt-2">Документы не загружены</p>
+                                {% if member.status == 'pending' %}
+                                    <small class="text-muted">Вы можете загрузить документы после прохождения модерации</small>
+                                {% endif %}
                             </div>
                         {% endif %}
                     </div>

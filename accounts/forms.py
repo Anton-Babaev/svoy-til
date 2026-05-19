@@ -21,6 +21,9 @@ class MemberRegistrationForm(forms.ModelForm):
             'phone',
             'membership_category',
             'agreement_signed',
+            'charter_document',
+            'ogrn_document',
+            'inn_document',
         ]
         labels = {
             'company_name': 'Название организации',
@@ -33,6 +36,9 @@ class MemberRegistrationForm(forms.ModelForm):
             'phone': 'Телефон',
             'membership_category': 'Категория членства',
             'agreement_signed': 'Согласие на обработку персональных данных',
+            'charter_document': 'Устав организации (PDF, JPG, PNG)',
+            'ogrn_document': 'Свидетельство ОГРН (PDF, JPG, PNG)',
+            'inn_document': 'Свидетельство ИНН (PDF, JPG, PNG)',
         }
         widgets = {
             'company_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'ООО "Ромашка"'}),
@@ -45,6 +51,9 @@ class MemberRegistrationForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+7 (495) 123-45-67'}),
             'membership_category': forms.Select(attrs={'class': 'form-select'}),
             'agreement_signed': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'charter_document': forms.FileInput(attrs={'class': 'form-control'}),
+            'ogrn_document': forms.FileInput(attrs={'class': 'form-control'}),
+            'inn_document': forms.FileInput(attrs={'class': 'form-control'}),
         }
     
     def clean_email(self):
@@ -80,6 +89,41 @@ class MemberRegistrationForm(forms.ModelForm):
         # Удаляем все пробелы и знаки
         phone = ''.join(c for c in phone if c.isdigit() or c == '+')
         return phone
+    
+    def clean_charter_document(self):
+        """Валидация устава"""
+        document = self.cleaned_data.get('charter_document')
+        if document:
+            # Проверяем размер файла (макс 5 МБ)
+            if document.size > 5 * 1024 * 1024:
+                raise forms.ValidationError('Размер файла не должен превышать 5 МБ')
+            # Проверяем расширение
+            ext = document.name.split('.')[-1].lower()
+            if ext not in ['pdf', 'jpg', 'jpeg', 'png']:
+                raise forms.ValidationError('Поддерживаются только PDF, JPG и PNG файлы')
+        return document
+    
+    def clean_ogrn_document(self):
+        """Валидация свидетельства ОГРН"""
+        document = self.cleaned_data.get('ogrn_document')
+        if document:
+            if document.size > 5 * 1024 * 1024:
+                raise forms.ValidationError('Размер файла не должен превышать 5 МБ')
+            ext = document.name.split('.')[-1].lower()
+            if ext not in ['pdf', 'jpg', 'jpeg', 'png']:
+                raise forms.ValidationError('Поддерживаются только PDF, JPG и PNG файлы')
+        return document
+    
+    def clean_inn_document(self):
+        """Валидация свидетельства ИНН"""
+        document = self.cleaned_data.get('inn_document')
+        if document:
+            if document.size > 5 * 1024 * 1024:
+                raise forms.ValidationError('Размер файла не должен превышать 5 МБ')
+            ext = document.name.split('.')[-1].lower()
+            if ext not in ['pdf', 'jpg', 'jpeg', 'png']:
+                raise forms.ValidationError('Поддерживаются только PDF, JPG и PNG файлы')
+        return document
     
     def clean(self):
         """Проверка совпадения паролей"""

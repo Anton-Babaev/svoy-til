@@ -61,6 +61,8 @@ class MemberAdmin(admin.ModelAdmin):
             'fields': ('inn', 'ogrn', 'legal_address', 'actual_address', 'director_fullname', 'phone'),
             'description': 'Все данные шифруются в базе данных'
         }),
+        ('Загруженные документы', {'fields': ('charter_document', 'ogrn_document', 'inn_document',
+            'additional_document')}),
         ('Согласие и даты', {
             'fields': ('agreement_signed', 'agreement_date', 'created_at'),
             'description': 'Юридически значимая информация'

@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 def register(request):
     """Регистрация нового члена ассоциации"""
     if request.method == 'POST':
-        form = MemberRegistrationForm(request.POST)
+        form = MemberRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
             # Создаем пользователя
             user = User.objects.create_user(
@@ -19,20 +19,19 @@ def register(request):
                 password=form.cleaned_data['password']
             )
             
-            # Создаем члена ассоциации
+            # Создаем члена ассоциации (form.save уже сохранит все поля, включая файлы)
             member = form.save(commit=False)
             member.user = user
             member.status = 'pending'
-            member.save()
+            # НЕ нужно отдельно сохранять файлы - form.save сделает это
+            member.save()  # Одно сохранение!
             
             # Отправляем email уведомления
             try:
                 send_registration_email(user, member, request)
                 send_admin_notification(member, request)
-                messages.success(request, 'Регистрация успешно завершена! Письмо с подтверждением отправлено на ваш email.')
             except Exception as e:
                 print(f"Email error: {e}")
-                messages.warning(request, 'Регистрация прошла успешно, но не удалось отправить email уведомление.')
             
             # Автоматически входим в систему
             login(request, user)

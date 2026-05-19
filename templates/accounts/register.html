@@ -140,7 +140,7 @@
                     </div>
                     
                     <div class="card-body p-4 p-lg-5">
-                        <form method="post">
+                        <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                             
                             {% if form.non_field_errors %}
@@ -304,7 +304,54 @@
                                     </div>
                                 </div>
                             </div>
-                            
+                            <!-- Документы -->
+                            <div class="form-section">
+                                <div class="form-section-title">
+                                    <i class="bi bi-file-earmark-pdf"></i>
+                                    <span>Загружаемые документы</span>
+                                </div>
+                                
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i>
+                                    <strong>Важно:</strong> Загрузите сканы или фото следующих документов в формате PDF, JPG или PNG.
+                                    Документы необходимы для подтверждения регистрационных данных.
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <label for="{{ form.charter_document.id_for_label }}" class="form-label">
+                                            {{ form.charter_document.label }}
+                                        </label>
+                                        {{ form.charter_document }}
+                                        <div class="form-text">Загрузите устав организации (PDF, JPG, PNG)</div>
+                                        {% if form.charter_document.errors %}
+                                            <div class="errorlist">{{ form.charter_document.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.ogrn_document.id_for_label }}" class="form-label">
+                                            {{ form.ogrn_document.label }}
+                                        </label>
+                                        {{ form.ogrn_document }}
+                                        <div class="form-text">Свидетельство ОГРН (PDF, JPG, PNG)</div>
+                                        {% if form.ogrn_document.errors %}
+                                            <div class="errorlist">{{ form.ogrn_document.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.inn_document.id_for_label }}" class="form-label">
+                                            {{ form.inn_document.label }}
+                                        </label>
+                                        {{ form.inn_document }}
+                                        <div class="form-text">Свидетельство ИНН (PDF, JPG, PNG)</div>
+                                        {% if form.inn_document.errors %}
+                                            <div class="errorlist">{{ form.inn_document.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Согласие -->
                             <div class="form-check mb-4">
                                 {{ form.agreement_signed }}
