@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def send_registration_email(user, member, request):
     """Отправка письма при регистрации"""
     try:
@@ -39,7 +40,7 @@ def send_registration_email(user, member, request):
         send_mail(
             subject,
             plain_message,
-            'noreply@svoy-tyl.ru',  # Временный отправитель для разработки
+            settings.DEFAULT_FROM_EMAIL,  # Исправлено: используем настройки
             [member.email],
             fail_silently=False,
             html_message=html_message
@@ -49,6 +50,7 @@ def send_registration_email(user, member, request):
     except Exception as e:
         logger.error(f"Failed to send registration email: {e}")
         return False
+
 
 def send_admin_notification(member, request):
     """Отправка уведомления админу о новой регистрации"""
@@ -76,7 +78,7 @@ def send_admin_notification(member, request):
         send_mail(
             subject,
             plain_message,
-            'noreply@svoy-tyl.ru',
+            settings.DEFAULT_FROM_EMAIL,  # Исправлено: используем настройки
             settings.ADMIN_EMAILS,
             fail_silently=False,
             html_message=html_message
@@ -86,3 +88,4 @@ def send_admin_notification(member, request):
     except Exception as e:
         logger.error(f"Failed to send admin notification: {e}")
         return False
+    

@@ -2,10 +2,14 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+import logging
 from .forms import MemberRegistrationForm
 from .utils import send_registration_email, send_admin_notification
 from members.models import Member
 from django.contrib.auth.models import User
+
+logger = logging.getLogger(__name__)
+
 
 def register(request):
     """Регистрация нового члена ассоциации"""
@@ -19,29 +23,59 @@ def register(request):
                 password=form.cleaned_data['password']
             )
             
-            # Создаем члена ассоциации (form.save уже сохранит все поля, включая файлы)
+            # Создаем члена ассоциации
             member = form.save(commit=False)
             member.user = user
             member.status = 'pending'
-            # НЕ нужно отдельно сохранять файлы - form.save сделает это
-            member.save()  # Одно сохранение!
+            member.save()
             
             # Отправляем email уведомления
+            email_errors = []
+            
             try:
-                send_registration_email(user, member, request)
-                send_admin_notification(member, request)
+                email_sent = send_registration_email(user, member, request)
+                if not email_sent:
+                    email_errors.append('регистрационное')
             except Exception as e:
-                print(f"Email error: {e}")
+                logger.error(f"Registration email error: {e}")
+                email_errors.append('регистрационное')
+            
+            try:
+                admin_sent = send_admin_notification(member, request)
+                if not admin_sent:
+                    email_errors.append('администратору')
+            except Exception as e:
+                logger.error(f"Admin notification error: {e}")
+                email_errors.append('администратору')
             
             # Автоматически входим в систему
             login(request, user)
             
-            messages.success(request, 'Регистрация успешно завершена! Ваша заявка отправлена на модерацию.')
+            # Очищаем все предыдущие сообщения, чтобы избежать дублей
+            storage = messages.get_messages(request)
+            storage.used = True
+            
+            # Сообщение пользователю (только одно!)
+            if email_errors:
+                messages.warning(
+                    request, 
+                    f'Регистрация успешно завершена! Ваша заявка отправлена на модерацию. '
+                    f'Не удалось отправить {" и ".join(email_errors)} письмо(а). '
+                    f'Мы свяжемся с вами в ближайшее время.'
+                )
+            else:
+                messages.success(
+                    request, 
+                    'Регистрация успешно завершена! Ваша заявка отправлена на модерацию. '
+                    'Уведомление отправлено на ваш email.'
+                )
+            
             return redirect('accounts:profile')
     else:
         form = MemberRegistrationForm()
     
     return render(request, 'accounts/register.html', {'form': form})
+
 
 @login_required
 def profile(request):
@@ -60,6 +94,11 @@ def profile(request):
         member.director_fullname = request.POST.get('director_fullname', member.director_fullname)
         member.phone = request.POST.get('phone', member.phone)
         member.save()
+        
+        # Очищаем старые сообщения перед добавлением нового
+        storage = messages.get_messages(request)
+        storage.used = True
+        
         messages.success(request, 'Данные успешно обновлены!')
         return redirect('accounts:profile')
     

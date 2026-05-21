@@ -68,6 +68,23 @@ a:hover {
     box-shadow: 0 8px 20px rgba(13, 110, 253, 0.15);
 }
 
+/* Кликабельные карточки */
+.news-card, 
+.event-card, 
+.measure-card, 
+.project-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.news-card:hover, 
+.event-card:hover, 
+.measure-card:hover, 
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
 /* Заголовки */
 h2 {
     border-left: 4px solid var(--primary);

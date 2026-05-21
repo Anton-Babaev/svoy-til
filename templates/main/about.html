@@ -1,14 +1,126 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}О нас - Свой Тыл{% endblock %}
 
+{% block extra_css %}
+<style>
+    .about-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+    
+    .mission-card {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        border-left: 4px solid #667eea;
+    }
+    
+    .values-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    
+    .values-list li {
+        padding: 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .values-list li i {
+        color: #667eea;
+        font-size: 24px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h1 class="mb-4">Об ассоциации</h1>
-        <p class="lead">Страница находится в разработке</p>
-        <p>Здесь будет размещена информация о целях и задачах ассоциации, истории создания, команде и контактах.</p>
-        <a href="/" class="btn btn-primary">Вернуться на главную</a>
+<div class="about-header">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Об ассоциации</h1>
+        <p class="lead">Развиваем предпринимательскую среду среди ветеранов СВО</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="mission-card">
+                <h3><i class="bi bi-flag"></i> Наша миссия</h3>
+                <p class="lead">Создание устойчивой системы поддержки ветеранов через объединение усилий бизнес-сообщества.</p>
+            </div>
+            
+            <h2>Кто мы</h2>
+            <p>Ассоциация «Свой Тыл» создана в 2026 году по инициативе группы ветеранов, которые, выполнив гражданский долг и пройдя службу по мобилизации, уволены в запас. Основная задача — внести реальный вклад в поддержку ветеранов специальной военной операции и членов их семей.</p>
+            
+            <h2 class="mt-4">Наши цели</h2>
+            <ul>
+                <li>Организация системной помощи ветеранам СВО</li>
+                <li>Создание рабочих мест для ветеранов и членов их семей</li>
+                <li>Предоставление консультаций по мерам поддержки для бизнеса-участников ассоциации</li>
+                <li>Развитие социального предпринимательства в сфере поддержки ветеранов</li>
+                <li>Формирование сообщества ответственных предпринимателей</li>
+            </ul>
+            
+            <h2 class="mt-4">Наши ценности</h2>
+            <ul class="values-list">
+                <li><i class="bi bi-shield-check"></i> <strong>Ответственность</strong> - перед ветеранами и обществом</li>
+                <li><i class="bi bi-people"></i> <strong>Взаимопомощь</strong> - поддержка участников ассоциации</li>
+                <li><i class="bi bi-graph-up"></i> <strong>Развитие</strong> - постоянное совершенствование</li>
+                <li><i class="bi bi-eye"></i> <strong>Прозрачность</strong> - открытость деятельности</li>
+            </ul>
+            
+            <h2 class="mt-4">Что мы предлагаем участникам</h2>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5><i class="bi bi-briefcase"></i> Бизнес-поддержка</h5>
+                            <p>Консультации, юридическая помощь, продвижение</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5><i class="bi bi-person-workspace"></i> Нетворкинг</h5>
+                            <p>Регулярные встречи, обмен опытом, партнёрство</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5><i class="bi bi-megaphone"></i> Продвижение</h5>
+                            <p>Информационная поддержка на сайте и в соцсетях</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5><i class="bi bi-book"></i> Обучение</h5>
+                            <p>Вебинары, мастер-классы, обучающие программы</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-primary text-center mt-4">
+                <h5>Хотите стать частью ассоциации?</h5>
+                <p>Присоединяйтесь к сообществу ответственных предпринимателей</p>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg">Подать заявку</a>
+                {% else %}
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-primary btn-lg">Перейти в личный кабинет</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

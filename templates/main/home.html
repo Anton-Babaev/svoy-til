@@ -132,11 +132,25 @@
         padding-left: 15px;
         margin-bottom: 25px;
     }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .section-header h2 {
+        margin-bottom: 0;
+    }
+    
+    .section-header .btn-outline-primary {
+        white-space: nowrap;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-
 <div class="hero-slider">
     <div class="slide active">
         <img class="slide-image" src="{% static 'images/horse.jpg' %}" alt="Слайд 1">
@@ -212,17 +226,17 @@
 <!-- Меры поддержки -->
 {% if support_measures %}
 <div class="container mb-5">
+    <div class="section-header">
+        <h2>Меры поддержки</h2>
+        <a href="{% url 'support_measures' %}" class="btn btn-outline-primary">Все меры поддержки →</a>
+    </div>
     <div class="row">
-        <div class="col-12">
-            <h2>Меры поддержки</h2>
-        </div>
         {% for measure in support_measures %}
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">{{ measure.title }}</h5>
                         <p class="card-text text-muted">{{ measure.description|truncatewords:20 }}</p>
-                        <a href="{% url 'support_measures' %}" class="btn btn-outline-primary btn-sm mt-2">Подробнее</a>
                     </div>
                 </div>
             </div>
@@ -234,17 +248,43 @@
 <!-- Активные проекты -->
 {% if projects %}
 <div class="container mb-5">
+    <div class="section-header">
+        <h2>Активные проекты</h2>
+        <a href="{% url 'projects_list' %}" class="btn btn-outline-primary">Все проекты →</a>
+    </div>
     <div class="row">
-        <div class="col-12">
-            <h2>Активные проекты</h2>
-        </div>
         {% for project in projects %}
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">
                         <h5 class="card-title">{{ project.title }}</h5>
                         <p class="card-text text-muted">{{ project.description|truncatewords:20 }}</p>
-                        <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-primary btn-sm mt-2">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Предстоящие мероприятия -->
+{% if upcoming_events %}
+<div class="container mb-5">
+    <div class="section-header">
+        <h2>Предстоящие мероприятия</h2>
+        <a href="{% url 'events_list' %}" class="btn btn-outline-primary">Все мероприятия →</a>
+    </div>
+    <div class="row">
+        {% for event in upcoming_events %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <small class="text-muted">{{ event.start_date|date:"d.m.Y H:i" }}</small>
+                        <h5 class="card-title mt-2">{{ event.title }}</h5>
+                        <p class="card-text text-muted">{{ event.short_description|truncatewords:15 }}</p>
+                        <p class="card-text small">
+                            <i class="bi bi-geo-alt"></i> {{ event.location }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -256,10 +296,11 @@
 <!-- Новости -->
 {% if news %}
 <div class="container mb-5">
+    <div class="section-header">
+        <h2>Новости</h2>
+        <a href="{% url 'news_list' %}" class="btn btn-outline-primary">Все новости →</a>
+    </div>
     <div class="row">
-        <div class="col-12">
-            <h2>Новости</h2>
-        </div>
         {% for item in news %}
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
@@ -267,14 +308,10 @@
                         <small class="text-muted">{{ item.published_at|date:"d.m.Y" }}</small>
                         <h5 class="card-title mt-2">{{ item.title }}</h5>
                         <p class="card-text text-muted">{{ item.content|truncatewords:20|safe }}</p>
-                        <a href="{% url 'news_detail' item.id %}" class="btn btn-outline-primary btn-sm mt-2">Читать</a>
                     </div>
                 </div>
             </div>
         {% endfor %}
-        <div class="col-12 text-center mt-3">
-            <a href="{% url 'news_list' %}" class="btn btn-outline-primary">Все новости →</a>
-        </div>
     </div>
 </div>
 {% endif %}

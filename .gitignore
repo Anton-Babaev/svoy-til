@@ -34,3 +34,21 @@ desktop.ini
 
 # Файлы macOS
 .DS_Store
+
+# Тестовые данные и скрипты
+fixtures/*.json
+test_*.py
+reset_*.py
+create_*.py
+load_*.py
+RUN_*.bat
+RUN_*.sh
+
+# Временные файлы
+*.tmp
+*.bak
+*.backup
+
+# Миграции (опционально - лучше хранить в репозитории)
+# */migrations/*.py
+# !*/migrations/__init__.py

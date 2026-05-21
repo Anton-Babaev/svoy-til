@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ measure.title }} - Свой Тыл{% endblock %}
+
+{% block extra_css %}
+<style>
+    .measure-detail-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+    
+    .measure-content {
+        font-size: 18px;
+        line-height: 1.8;
+        color: #333;
+    }
+    
+    .measure-content p {
+        margin-bottom: 20px;
+    }
+    
+    .measure-meta {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .measure-meta-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .measure-meta-item:last-child {
+        border-bottom: none;
+    }
+    
+    .meta-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+    }
+    
+    .meta-icon i {
+        color: white;
+        font-size: 20px;
+    }
+    
+    .btn-download {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+    
+    .back-button {
+        margin-bottom: 20px;
+    }
+    
+    .btn-back {
+        background: #667eea;
+        color: white;
+        border-radius: 8px;
+        padding: 8px 20px;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-back:hover {
+        background: #764ba2;
+        color: white;
+        transform: translateX(-5px);
+    }
+    
+    .other-measure-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+        margin-bottom: 15px;
+        cursor: pointer;
+    }
+    
+    .other-measure-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="measure-detail-header">
+    <div class="container">
+        <div class="back-button">
+            <a href="{% url 'support_measures' %}" class="btn-back">
+                ← Ко всем мерам поддержки
+            </a>
+        </div>
+        <h1 class="display-5 fw-bold">{{ measure.title }}</h1>
+        <p class="lead">{{ measure.description|truncatewords:30 }}</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="measure-content">
+                {{ measure.description|linebreaks|safe }}
+            </div>
+            
+            {% if measure.document %}
+                <div class="mt-4">
+                    <a href="{{ measure.document.url }}" class="btn-download" target="_blank">
+                        <i class="bi bi-download"></i> Скачать документ (PDF)
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="measure-meta">
+                <h5 class="mb-3">Информация</h5>
+                
+                <div class="measure-meta-item">
+                    <div class="meta-icon">
+                        <i class="bi bi-calendar"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Дата добавления</small><br>
+                        <strong>{{ measure.created_at|date:"d.m.Y" }}</strong>
+                    </div>
+                </div>
+                
+                <div class="measure-meta-item">
+                    <div class="meta-icon">
+                        <i class="bi bi-tag"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Тип</small><br>
+                        <strong>Мера поддержки</strong>
+                    </div>
+                </div>
+            </div>
+            
+            {% if other_measures %}
+                <div class="mt-4">
+                    <h5 class="mb-3">Другие меры поддержки</h5>
+                    {% for other in other_measures %}
+                        <div class="card other-measure-card" onclick="window.location.href='{% url 'support_measure_detail' other.id %}'">
+                            <div class="card-body">
+                                <h6>{{ other.title }}</h6>
+                                <small class="text-muted">
+                                    {{ other.created_at|date:"d.m.Y" }}
+                                </small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <div class="mt-4">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Нужна консультация?</strong><br>
+                    По вопросам получения мер поддержки обращайтесь к нам по электронной почте или телефону.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Делаем карточки кликабельными
+    document.querySelectorAll('.other-measure-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const url = this.getAttribute('onclick').match(/'(.*?)'/)[1];
+            window.location.href = url;
+        });
+    });
+</script>
+{% endblock %}

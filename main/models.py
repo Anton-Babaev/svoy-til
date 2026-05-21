@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.core.validators import FileExtensionValidator, MaxValueValidator
+from django.utils import timezone
 
 class News(models.Model):
     """Новости ассоциации"""
@@ -10,12 +11,12 @@ class News(models.Model):
         verbose_name='Дата публикации'
     )
     is_published = models.BooleanField(default=True, verbose_name='Опубликовано')
-
+    
     class Meta:
         verbose_name = 'Новость'
         verbose_name_plural = 'Новости'
         ordering = ['-published_at']
-
+    
     def __str__(self):
         return self.title
 
@@ -34,12 +35,12 @@ class SupportMeasure(models.Model):
         auto_now_add=True,
         verbose_name='Дата создания'
     )
-
+    
     class Meta:
         verbose_name = 'Мера поддержки'
         verbose_name_plural = 'Меры поддержки'
         ordering = ['-created_at']
-
+    
     def __str__(self):
         return self.title
 
@@ -61,12 +62,12 @@ class Project(models.Model):
         null=True,
         verbose_name='Изображение проекта'
     )
-
+    
     class Meta:
         verbose_name = 'Проект'
         verbose_name_plural = 'Проекты'
         ordering = ['-start_date']
-
+    
     def __str__(self):
         return self.title
 
@@ -171,7 +172,6 @@ class Event(models.Model):
     
     def is_registration_open(self):
         """Проверяет, открыта ли регистрация"""
-        from django.utils import timezone
         if self.status != 'published':
             return False
         if self.registration_deadline and self.registration_deadline < timezone.now():
@@ -233,4 +233,6 @@ class EventRegistration(models.Model):
         unique_together = ['event', 'member']  # Одна регистрация на мероприятие
     
     def __str__(self):
-        return f"{self.member.company_name} - {self.event.title}"
+        """Улучшенное отображение в админке"""
+        status_display = self.get_status_display()
+        return f"{self.member.company_name} - {self.event.title} ({status_display})"

@@ -17,11 +17,13 @@
         border-radius: 15px;
         box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         margin-bottom: 30px;
-        transition: transform 0.3s;
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
     }
     
     .measure-card:hover {
         transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
     }
     
     .measure-icon {
@@ -40,6 +42,28 @@
         color: white;
     }
     
+    .measure-description {
+        max-height: 100px;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    
+    .measure-description.expanded {
+        max-height: 1000px;
+    }
+    
+    .read-more-btn {
+        color: #667eea;
+        cursor: pointer;
+        font-size: 14px;
+        margin-top: 10px;
+        display: inline-block;
+    }
+    
+    .read-more-btn:hover {
+        color: #764ba2;
+    }
+    
     .btn-download {
         background: #667eea;
         color: white;
@@ -47,11 +71,14 @@
         padding: 5px 15px;
         font-size: 14px;
         transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
     }
     
     .btn-download:hover {
         background: #764ba2;
         color: white;
+        transform: translateY(-2px);
     }
 </style>
 {% endblock %}
@@ -68,7 +95,7 @@
     <div class="row justify-content-center">
         <div class="col-lg-8">
             {% for measure in measures %}
-                <div class="card measure-card">
+                <div class="card measure-card" onclick="window.location.href='{% url 'support_measure_detail' measure.id %}'">
                     <div class="card-body p-4">
                         <div class="d-flex align-items-start">
                             <div class="measure-icon flex-shrink-0">
@@ -76,12 +103,14 @@
                             </div>
                             <div class="ms-3 flex-grow-1">
                                 <h4>{{ measure.title }}</h4>
-                                <p class="text-muted">{{ measure.description }}</p>
+                                <div class="measure-description">
+                                    <p class="text-muted">{{ measure.description|linebreaks|truncatewords:50 }}</p>
+                                </div>
                                 <div class="text-muted small mb-3">
                                     <i class="bi bi-calendar3"></i> Добавлено: {{ measure.created_at|date:"d.m.Y" }}
                                 </div>
                                 {% if measure.document %}
-                                    <a href="{{ measure.document.url }}" class="btn-download text-decoration-none" target="_blank">
+                                    <a href="{{ measure.document.url }}" class="btn-download" target="_blank" onclick="event.stopPropagation()">
                                         <i class="bi bi-download"></i> Скачать документ
                                     </a>
                                 {% endif %}

@@ -7,10 +7,12 @@
         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
         .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
         .content { padding: 30px; background: #f9f9f9; }
+        .footer { text-align: center; padding: 20px; font-size: 12px; color: #999; }
         .status-badge { display: inline-block; padding: 5px 10px; border-radius: 5px; color: white; font-weight: bold; }
         .status-active { background: #28a745; }
         .status-blocked { background: #dc3545; }
         .status-pending { background: #ffc107; color: #333; }
+        .logo { text-align: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -26,18 +28,25 @@
             <p>
                 <strong>Было:</strong> {{ old_status }}<br>
                 <strong>Стало:</strong> 
-                {% if new_status == 'активен' %}
+                {% if new_status == 'Активен' %}
                     <span class="status-badge status-active">{{ new_status }}</span>
-                {% elif new_status == 'заблокирован' %}
+                {% elif new_status == 'Заблокирован' %}
                     <span class="status-badge status-blocked">{{ new_status }}</span>
                 {% else %}
                     <span class="status-badge status-pending">{{ new_status }}</span>
                 {% endif %}
             </p>
             
-            {% if new_status == 'активен' %}
+            {% if new_status == 'Активен' %}
                 <p>Поздравляем! Вы стали полноправным членом ассоциации. Теперь вам доступен полный функционал личного кабинета.</p>
-            {% elif new_status == 'заблокирован' %}
+                <p>Вы можете:</p>
+                <ul>
+                    <li>Участвовать в мероприятиях ассоциации</li>
+                    <li>Получать меры поддержки</li>
+                    <li>Участвовать в проектах</li>
+                    <li>Общаться с другими участниками</li>
+                </ul>
+            {% elif new_status == 'Заблокирован' %}
                 <p>К сожалению, ваша заявка отклонена. Для получения подробной информации свяжитесь с администрацией.</p>
             {% else %}
                 <p>Ваша заявка находится на рассмотрении. Мы свяжемся с вами в ближайшее время.</p>
@@ -47,6 +56,7 @@
         </div>
         <div class="footer">
             <p>© 2025 Ассоциация "Свой Тыл"</p>
+            <p><small>info@svoy-tyl.ru | +7 (XXX) XXX-XX-XX</small></p>
         </div>
     </div>
 </body>

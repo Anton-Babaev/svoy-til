@@ -1,23 +1,38 @@
 from django.db.models import Q
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
-from main.models import News, Project, SupportMeasure, Event, EventRegistration
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.shortcuts import redirect
-from datetime import timedelta
 from django.utils import timezone
+from django.views.decorators.cache import cache_page
+from datetime import timedelta
+import logging
 
+from main.models import News, Project, SupportMeasure, Event, EventRegistration
+
+logger = logging.getLogger(__name__)
+
+
+@cache_page(60 * 15)  # Кеширование на 15 минут
 def home(request):
+    """Главная страница"""
+    
     context = {
         'news': News.objects.filter(is_published=True)[:3],
         'projects': Project.objects.filter(is_active=True)[:3],
         'support_measures': SupportMeasure.objects.all()[:3],
+        'upcoming_events': Event.objects.filter(
+            status='published',
+            start_date__gte=timezone.now()
+        ).order_by('start_date')[:3],
     }
     return render(request, 'main/home.html', context)
 
+
 def about(request):
+    """Страница "О нас" """
     return render(request, 'main/about.html')
+
 
 def news_list(request):
     """Список всех новостей"""
@@ -27,64 +42,47 @@ def news_list(request):
     news = paginator.get_page(page_number)
     return render(request, 'main/news_list.html', {'news': news})
 
+
 def news_detail(request, news_id):
     """Детальная страница новости"""
     news = get_object_or_404(News, id=news_id, is_published=True)
     other_news = News.objects.filter(is_published=True).exclude(id=news_id)[:3]
-    return render(request, 'main/news_detail.html', {'news': news, 'other_news': other_news})
+    return render(request, 'main/news_detail.html', {
+        'news': news,
+        'other_news': other_news
+    })
+
 
 def projects_list(request):
     """Список проектов"""
     projects = Project.objects.filter(is_active=True).order_by('-start_date')
     return render(request, 'main/projects_list.html', {'projects': projects})
 
+
+def project_detail(request, project_id):
+    """Детальная страница проекта"""
+    project = get_object_or_404(Project, id=project_id)
+    other_projects = Project.objects.filter(is_active=True).exclude(id=project_id)[:3]
+    return render(request, 'main/project_detail.html', {
+        'project': project,
+        'other_projects': other_projects
+    })
+
+
 def support_measures_list(request):
     """Список мер поддержки"""
     measures = SupportMeasure.objects.all().order_by('-created_at')
     return render(request, 'main/support_measures.html', {'measures': measures})
 
-def search(request):
-    """Поиск по сайту"""
-    query = request.GET.get('q', '')
-    results = {
-        'news': [],
-        'projects': [],
-        'support_measures': []
-    }
-    
-    if query:
-        results['news'] = News.objects.filter(
-            Q(title__icontains=query) | Q(content__icontains=query),
-            is_published=True
-        )[:10]
-        
-        results['projects'] = Project.objects.filter(
-            Q(title__icontains=query) | Q(description__icontains=query),
-            is_active=True
-        )[:10]
-        
-        results['support_measures'] = SupportMeasure.objects.filter(
-            Q(title__icontains=query) | Q(description__icontains=query)
-        )[:10]
-    
-    context = {
-        'query': query,
-        'results': results,
-        'total_count': sum([len(results['news']), len(results['projects']), len(results['support_measures'])])
-    }
-    return render(request, 'main/search.html', context)
 
 def events_list(request):
     """Список мероприятий"""
-    from django.utils import timezone
-    
-    events = Event.objects.filter(
+    # Оптимизация: используем select_related если есть связанные поля
+    upcoming_events = Event.objects.filter(
         status='published',
         start_date__gte=timezone.now()
     ).order_by('start_date')
     
-    # Разделяем на предстоящие и прошедшие
-    upcoming_events = events.filter(start_date__gte=timezone.now())
     past_events = Event.objects.filter(
         status='published',
         start_date__lt=timezone.now()
@@ -96,20 +94,22 @@ def events_list(request):
     }
     return render(request, 'main/events_list.html', context)
 
+
 def event_detail(request, event_id):
     """Детальная страница мероприятия"""
-    from django.utils import timezone
-    
     event = get_object_or_404(Event, id=event_id, status='published')
     
-    # Проверяем, зарегистрирован ли текущий пользователь (только активные регистрации)
+    # Оптимизация: получаем регистрацию одним запросом, если нужно
     is_registered = False
+    registration = None
+    
     if request.user.is_authenticated and hasattr(request.user, 'member'):
-        is_registered = EventRegistration.objects.filter(
+        registration = EventRegistration.objects.filter(
             event=event,
             member=request.user.member,
-            status='registered'  # Только активные
-        ).exists()
+            status='registered'
+        ).first()
+        is_registered = registration is not None
     
     context = {
         'event': event,
@@ -118,12 +118,6 @@ def event_detail(request, event_id):
     }
     return render(request, 'main/event_detail.html', context)
 
-def project_detail(request, project_id):
-    """Детальная страница проекта"""
-    project = get_object_or_404(Project, id=project_id)
-    # Другие проекты для блока "Похожие проекты"
-    other_projects = Project.objects.filter(is_active=True).exclude(id=project_id)[:3]
-    return render(request, 'main/project_detail.html', {'project': project, 'other_projects': other_projects})
 
 @login_required
 def event_register(request, event_id):
@@ -140,7 +134,7 @@ def event_register(request, event_id):
         messages.error(request, 'Регистрация на это мероприятие закрыта')
         return redirect('event_detail', event_id=event.id)
     
-    # Проверяем, не зарегистрирован ли уже (включая отмененные)
+    # Проверяем, не зарегистрирован ли уже
     existing_registration = EventRegistration.objects.filter(
         event=event,
         member=request.user.member
@@ -183,7 +177,7 @@ def event_cancel(request, event_id):
         messages.error(request, 'Невозможно отменить регистрацию: мероприятие уже началось')
         return redirect('event_detail', event_id=event.id)
     
-    # Проверка: можно отменить за 24 часа до начала?
+    # Проверка: можно отменить за 24 часа до начала
     cancel_deadline = event.start_date - timedelta(hours=24)
     if cancel_deadline < timezone.now():
         hours_left = int((event.start_date - timezone.now()).total_seconds() / 3600)
@@ -213,3 +207,49 @@ def event_cancel(request, event_id):
         messages.error(request, 'Активная регистрация на это мероприятие не найдена')
     
     return redirect('event_detail', event_id=event.id)
+
+
+def search(request):
+    """Поиск по сайту"""
+    query = request.GET.get('q', '')
+    results = {
+        'news': [],
+        'projects': [],
+        'support_measures': []
+    }
+    
+    if query:
+        results['news'] = News.objects.filter(
+            Q(title__icontains=query) | Q(content__icontains=query),
+            is_published=True
+        )[:10]
+        
+        results['projects'] = Project.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query),
+            is_active=True
+        )[:10]
+        
+        results['support_measures'] = SupportMeasure.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query)
+        )[:10]
+    
+    context = {
+        'query': query,
+        'results': results,
+        'total_count': sum([len(results['news']), len(results['projects']), len(results['support_measures'])])
+    }
+    return render(request, 'main/search.html', context)
+
+
+def support_measure_detail(request, measure_id):
+    """Детальная страница меры поддержки"""
+    measure = get_object_or_404(SupportMeasure, id=measure_id)
+    
+    # Другие меры поддержки для блока "Другие меры поддержки"
+    other_measures = SupportMeasure.objects.exclude(id=measure_id)[:3]
+    
+    context = {
+        'measure': measure,
+        'other_measures': other_measures,
+    }
+    return render(request, 'main/support_measure_detail.html', context)
