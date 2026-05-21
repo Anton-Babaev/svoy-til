@@ -3,135 +3,357 @@
 
 {% block title %}Главная - Свой Тыл{% endblock %}
 
+{% block extra_css %}
+<style>
+    .hero-slider {
+        position: relative;
+        height: 550px;
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
+    
+    .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.8s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    .slide.active {
+        opacity: 1;
+    }
+    
+    .slide-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 20px;
+    }
+    
+    .slide-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 20px;
+    }
+    
+    .slide-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+        max-width: 800px;
+        padding: 0 20px;
+    }
+    
+    .slide-content h1 {
+        font-size: 48px;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    
+    .slide-content p {
+        font-size: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .slider-nav {
+        position: absolute;
+        bottom: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 12px;
+        z-index: 3;
+    }
+    
+    .slider-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+    }
+    
+    .slider-dot.active {
+        background: white;
+        width: 30px;
+        border-radius: 10px;
+    }
+    
+    .slider-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 3;
+        color: white;
+        font-size: 20px;
+    }
+    
+    .slider-prev {
+        left: 20px;
+    }
+    
+    .slider-next {
+        right: 20px;
+    }
+    
+    .card {
+        transition: transform 0.3s;
+        border-radius: 12px;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    h2 {
+        border-left: 4px solid #667eea;
+        padding-left: 15px;
+        margin-bottom: 25px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
-<!-- Слайдер/баннер (заглушка) -->
-<div class="row mb-5">
-    <div class="col-12">
-        <div class="bg-light p-5 text-center rounded-3">
-            <h1 class="display-4">Ассоциация "Свой Тыл"</h1>
-            <p class="lead">Скоро здесь будет информация о нашей деятельности</p>
-            <hr class="my-4">
-            <p>Мы создаём условия для развития бизнеса</p>
+<div class="hero-slider">
+    <div class="slide active">
+        <img class="slide-image" src="{% static 'images/horse.jpg' %}" alt="Слайд 1">
+        <div class="slide-overlay"></div>
+        <div class="slide-content">
+            <h1>Ассоциация "Свой Тыл"</h1>
+            <p>Объединяем бизнес для поддержки ветеранов СВО и их семей</p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">Вступить в ассоциацию</a>
+            {% else %}
+                <a href="{% url 'accounts:profile' %}" class="btn btn-light btn-lg">Личный кабинет</a>
+            {% endif %}
         </div>
+    </div>
+    
+    <div class="slide">
+        <img class="slide-image" src="{% static 'images/maws.jpg' %}" alt="Слайд 2">
+        <div class="slide-overlay"></div>
+        <div class="slide-content">
+            <h1>Вместе мы сила</h1>
+            <p>Объединяем усилия для помощи тем, кто защищал нашу Родину</p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">Присоединиться</a>
+            {% else %}
+                <a href="{% url 'events_list' %}" class="btn btn-light btn-lg">Мероприятия</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="slide">
+        <img class="slide-image" src="{% static 'images/mtpp.jpg' %}" alt="Слайд 3">
+        <div class="slide-overlay"></div>
+        <div class="slide-content">
+            <h1>Развиваемся вместе</h1>
+            <p>Поддержка бизнеса и социальные проекты для ветеранов</p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">Стать участником</a>
+            {% else %}
+                <a href="{% url 'projects_list' %}" class="btn btn-light btn-lg">Наши проекты</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="slide">
+        <img class="slide-image" src="{% static 'images/platonov.jpg' %}" alt="Слайд 4">
+        <div class="slide-overlay"></div>
+        <div class="slide-content">
+            <h1>Надёжная опора</h1>
+            <p>Создаём условия для развития бизнеса и помощи ветеранам</p>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">Зарегистрироваться</a>
+            {% else %}
+                <a href="{% url 'support_measures' %}" class="btn btn-light btn-lg">Меры поддержки</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="slider-arrow slider-prev">
+        <i class="bi bi-chevron-left"></i>
+    </div>
+    <div class="slider-arrow slider-next">
+        <i class="bi bi-chevron-right"></i>
+    </div>
+    
+    <div class="slider-nav">
+        <div class="slider-dot active" data-slide="0"></div>
+        <div class="slider-dot" data-slide="1"></div>
+        <div class="slider-dot" data-slide="2"></div>
+        <div class="slider-dot" data-slide="3"></div>
     </div>
 </div>
 
-<!-- Блок "Меры поддержки" -->
-<div class="row mb-5">
-    <div class="col-12">
-        <h2 class="mb-4">Меры поддержки</h2>
-    </div>
-    
-    <!-- Карточка 1 -->
-    <div class="col-md-4 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Финансовая поддержка</h5>
-                <p class="card-text">Информация о финансовых мерах поддержки появится здесь после наполнения базы данных.</p>
-                <a href="#" class="btn btn-outline-primary">Подробнее</a>
-            </div>
+<!-- Меры поддержки -->
+{% if support_measures %}
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-12">
+            <h2>Меры поддержки</h2>
         </div>
-    </div>
-    
-    <!-- Карточка 2 -->
-    <div class="col-md-4 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Консультационная помощь</h5>
-                <p class="card-text">Бесплатные консультации по вопросам бухгалтерии, юриспруденции и маркетинга.</p>
-                <a href="#" class="btn btn-outline-primary">Подробнее</a>
+        {% for measure in support_measures %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ measure.title }}</h5>
+                        <p class="card-text text-muted">{{ measure.description|truncatewords:20 }}</p>
+                        <a href="{% url 'support_measures' %}" class="btn btn-outline-primary btn-sm mt-2">Подробнее</a>
+                    </div>
+                </div>
             </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Активные проекты -->
+{% if projects %}
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-12">
+            <h2>Активные проекты</h2>
         </div>
-    </div>
-    
-    <!-- Карточка 3 -->
-    <div class="col-md-4 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Образовательные программы</h5>
-                <p class="card-text">Курсы, вебинары и тренинги для предпринимателей.</p>
-                <a href="#" class="btn btn-outline-primary">Подробнее</a>
+        {% for project in projects %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ project.title }}</h5>
+                        <p class="card-text text-muted">{{ project.description|truncatewords:20 }}</p>
+                        <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-primary btn-sm mt-2">Подробнее</a>
+                    </div>
+                </div>
             </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Новости -->
+{% if news %}
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-12">
+            <h2>Новости</h2>
+        </div>
+        {% for item in news %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <small class="text-muted">{{ item.published_at|date:"d.m.Y" }}</small>
+                        <h5 class="card-title mt-2">{{ item.title }}</h5>
+                        <p class="card-text text-muted">{{ item.content|truncatewords:20|safe }}</p>
+                        <a href="{% url 'news_detail' item.id %}" class="btn btn-outline-primary btn-sm mt-2">Читать</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="col-12 text-center mt-3">
+            <a href="{% url 'news_list' %}" class="btn btn-outline-primary">Все новости →</a>
         </div>
     </div>
 </div>
+{% endif %}
 
-<!-- Блок "Активные проекты" -->
-<div class="row mb-5">
-    <div class="col-12">
-        <h2 class="mb-4">Активные проекты</h2>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Проект "Развитие"</h5>
-                <p class="card-text">Описание проекта появится здесь после наполнения базы данных.</p>
-                <a href="#" class="btn btn-outline-primary">Подробнее</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Проект "Инновации"</h5>
-                <p class="card-text">Описание проекта появится здесь после наполнения базы данных.</p>
-                <a href="#" class="btn btn-outline-primary">Подробнее</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Проект "Экспорт"</h5>
-                <p class="card-text">Описание проекта появится здесь после наполнения базы данных.</p>
-                <a href="#" class="btn btn-outline-primary">Подробнее</a>
-            </div>
-        </div>
-    </div>
-</div>
+{% endblock %}
 
-<!-- Блок "Новости" -->
-<div class="row mb-5">
-    <div class="col-12">
-        <h2 class="mb-4">Новости</h2>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <small class="text-muted">1 марта 2026</small>
-                <h5 class="card-title mt-2">Открытие приёма заявок</h5>
-                <p class="card-text">Начинается приём заявок на участие в программе поддержки...</p>
-                <a href="#" class="btn btn-outline-primary">Читать</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <small class="text-muted">15 февраля 2026</small>
-                <h5 class="card-title mt-2">Новый проект запущен</h5>
-                <p class="card-text">Стартовал новый проект по поддержке малого бизнеса...</p>
-                <a href="#" class="btn btn-outline-primary">Читать</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <small class="text-muted">1 февраля 2026</small>
-                <h5 class="card-title mt-2">Вебинар для предпринимателей</h5>
-                <p class="card-text">Приглашаем на бесплатный вебинар о мерах поддержки...</p>
-                <a href="#" class="btn btn-outline-primary">Читать</a>
-            </div>
-        </div>
-    </div>
-</div>
-
+{% block extra_js %}
+<script>
+    (function() {
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slider .slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        const totalSlides = slides.length;
+        let autoSlideInterval;
+        
+        if (totalSlides === 0) return;
+        
+        function showSlide(index) {
+            if (index < 0) index = totalSlides - 1;
+            if (index >= totalSlides) index = 0;
+            
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            
+            currentSlide = index;
+        }
+        
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+        
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+        
+        function startAutoSlide() {
+            if (autoSlideInterval) clearInterval(autoSlideInterval);
+            autoSlideInterval = setInterval(nextSlide, 4500);
+        }
+        
+        function stopAutoSlide() {
+            if (autoSlideInterval) {
+                clearInterval(autoSlideInterval);
+                autoSlideInterval = null;
+            }
+        }
+        
+        document.querySelector('.slider-next').addEventListener('click', () => {
+            nextSlide();
+            stopAutoSlide();
+            startAutoSlide();
+        });
+        
+        document.querySelector('.slider-prev').addEventListener('click', () => {
+            prevSlide();
+            stopAutoSlide();
+            startAutoSlide();
+        });
+        
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                showSlide(index);
+                stopAutoSlide();
+                startAutoSlide();
+            });
+        });
+        
+        const slider = document.querySelector('.hero-slider');
+        if (slider) {
+            slider.addEventListener('mouseenter', stopAutoSlide);
+            slider.addEventListener('mouseleave', startAutoSlide);
+        }
+        
+        startAutoSlide();
+    })();
+</script>
 {% endblock %}

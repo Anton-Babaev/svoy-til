@@ -5,6 +5,8 @@ from main.models import News, Project, SupportMeasure, Event, EventRegistration
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.shortcuts import redirect
+from datetime import timedelta
+from django.utils import timezone
 
 def home(request):
     context = {
@@ -116,6 +118,13 @@ def event_detail(request, event_id):
     }
     return render(request, 'main/event_detail.html', context)
 
+def project_detail(request, project_id):
+    """Детальная страница проекта"""
+    project = get_object_or_404(Project, id=project_id)
+    # Другие проекты для блока "Похожие проекты"
+    other_projects = Project.objects.filter(is_active=True).exclude(id=project_id)[:3]
+    return render(request, 'main/project_detail.html', {'project': project, 'other_projects': other_projects})
+
 @login_required
 def event_register(request, event_id):
     """Регистрация на мероприятие"""
@@ -163,28 +172,38 @@ def event_register(request, event_id):
     messages.success(request, f'Вы успешно зарегистрированы на мероприятие "{event.title}"')
     return redirect('event_detail', event_id=event.id)
 
+
 @login_required
 def event_cancel(request, event_id):
     """Отмена регистрации на мероприятие"""
     event = get_object_or_404(Event, id=event_id)
     
+    # Проверка: мероприятие уже началось?
+    if event.start_date < timezone.now():
+        messages.error(request, 'Невозможно отменить регистрацию: мероприятие уже началось')
+        return redirect('event_detail', event_id=event.id)
+    
+    # Проверка: можно отменить за 24 часа до начала?
+    cancel_deadline = event.start_date - timedelta(hours=24)
+    if cancel_deadline < timezone.now():
+        hours_left = int((event.start_date - timezone.now()).total_seconds() / 3600)
+        messages.error(request, f'Невозможно отменить регистрацию: до начала мероприятия осталось менее {hours_left} часов. Отмена возможна за 24 часа.')
+        return redirect('event_detail', event_id=event.id)
+    
     if not hasattr(request.user, 'member'):
         messages.error(request, 'Профиль не найден')
         return redirect('home')
     
-    # Проверяем, существует ли активная регистрация
     registration = EventRegistration.objects.filter(
         event=event,
         member=request.user.member,
-        status='registered'  # Только активные регистрации
+        status='registered'
     ).first()
     
     if registration:
-        # Меняем статус, а не удаляем
         registration.status = 'cancelled'
         registration.save()
         
-        # Уменьшаем счетчик участников только один раз
         if event.current_participants > 0:
             event.current_participants -= 1
             event.save()

@@ -55,6 +55,12 @@ class Project(models.Model):
         null=True
     )
     is_active = models.BooleanField(default=True, verbose_name='Активен')
+    image = models.ImageField(
+        upload_to='projects/',
+        blank=True,
+        null=True,
+        verbose_name='Изображение проекта'
+    )
 
     class Meta:
         verbose_name = 'Проект'
@@ -63,6 +69,7 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Event(models.Model):
     """Модель мероприятий"""

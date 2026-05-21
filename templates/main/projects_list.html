@@ -16,13 +16,16 @@
         border: none;
         border-radius: 15px;
         box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        transition: transform 0.3s;
+        transition: all 0.3s ease;
         margin-bottom: 30px;
         overflow: hidden;
+        cursor: pointer;
+        background: white;
     }
     
     .project-card:hover {
         transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
     }
     
     .project-header {
@@ -44,6 +47,24 @@
         font-size: 14px;
         margin-top: 10px;
     }
+    
+    .project-description {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    .btn-detail {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-detail:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
 </style>
 {% endblock %}
 
@@ -59,7 +80,7 @@
     <div class="row">
         {% for project in projects %}
             <div class="col-md-6 col-lg-4">
-                <div class="project-card">
+                <div class="project-card" onclick="window.location.href='{% url 'project_detail' project.id %}'">
                     <div class="project-header">
                         <h5 class="mb-2">{{ project.title }}</h5>
                         <span class="project-status">
@@ -72,7 +93,10 @@
                         </div>
                     </div>
                     <div class="card-body p-4">
-                        <p class="text-muted">{{ project.description|truncatewords:30 }}</p>
+                        <p class="project-description">{{ project.description|truncatewords:25|linebreaks }}</p>
+                        <button class="btn btn-detail text-white w-100 mt-3">
+                            Подробнее о проекте
+                        </button>
                     </div>
                 </div>
             </div>
@@ -85,4 +109,24 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+    // Добавляем эффект при наведении на кнопку внутри карточки
+    const cards = document.querySelectorAll('.project-card');
+    cards.forEach(card => {
+        const btn = card.querySelector('.btn-detail');
+        card.addEventListener('mouseenter', () => {
+            if (btn) {
+                btn.style.transform = 'translateY(-2px)';
+                btn.style.boxShadow = '0 5px 15px rgba(102, 126, 234, 0.3)';
+            }
+        });
+        card.addEventListener('mouseleave', () => {
+            if (btn) {
+                btn.style.transform = 'translateY(0)';
+                btn.style.boxShadow = 'none';
+            }
+        });
+    });
+</script>
 {% endblock %}

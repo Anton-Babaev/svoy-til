@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ project.title }} - Свой Тыл{% endblock %}
+
+{% block extra_css %}
+<style>
+    .project-detail-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+    
+    .project-content {
+        font-size: 18px;
+        line-height: 1.8;
+        color: #333;
+    }
+    
+    .project-content p {
+        margin-bottom: 20px;
+    }
+    
+    .project-meta {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .project-meta-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .project-meta-item:last-child {
+        border-bottom: none;
+    }
+    
+    .meta-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+    }
+    
+    .meta-icon i {
+        color: white;
+        font-size: 20px;
+    }
+    
+    .other-project-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+        margin-bottom: 15px;
+        cursor: pointer;
+    }
+    
+    .other-project-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .back-button {
+        margin-bottom: 20px;
+    }
+    
+    .btn-back {
+        background: #667eea;
+        color: white;
+        border-radius: 8px;
+        padding: 8px 20px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #764ba2;
+        color: white;
+        transform: translateX(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="project-detail-header">
+    <div class="container">
+        <div class="back-button">
+            <a href="{% url 'projects_list' %}" class="btn btn-back">
+                ← Ко всем проектам
+            </a>
+        </div>
+        <h1 class="display-5 fw-bold">{{ project.title }}</h1>
+        <p class="lead">{{ project.description|truncatewords:30 }}</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="project-content">
+                {{ project.description|linebreaks|safe }}
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="project-meta">
+                <h5 class="mb-3">Информация о проекте</h5>
+                
+                <div class="project-meta-item">
+                    <div class="meta-icon">
+                        <i class="bi bi-calendar"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Дата начала</small><br>
+                        <strong>{{ project.start_date|date:"d.m.Y" }}</strong>
+                    </div>
+                </div>
+                
+                <div class="project-meta-item">
+                    <div class="meta-icon">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Дата окончания</small><br>
+                        <strong>
+                            {% if project.end_date %}
+                                {{ project.end_date|date:"d.m.Y" }}
+                            {% else %}
+                                Проект продолжается
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+                
+                <div class="project-meta-item">
+                    <div class="meta-icon">
+                        <i class="bi bi-tag"></i>
+                    </div>
+                    <div>
+                        <small class="text-muted">Статус</small><br>
+                        <strong>
+                            {% if project.is_active %}
+                                <span class="text-success">Активен</span>
+                            {% else %}
+                                <span class="text-secondary">Завершен</span>
+                            {% endif %}
+                        </strong>
+                    </div>
+                </div>
+            </div>
+            
+            {% if other_projects %}
+                <div class="mt-4">
+                    <h5 class="mb-3">Другие проекты</h5>
+                    {% for other in other_projects %}
+                        <div class="card other-project-card" onclick="window.location.href='{% url 'project_detail' other.id %}'">
+                            <div class="card-body">
+                                <h6>{{ other.title }}</h6>
+                                <small class="text-muted">
+                                    {{ other.start_date|date:"d.m.Y" }}
+                                    {% if other.is_active %} • Активен{% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <div class="mt-4">
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Хотите участвовать?</strong><br>
+                    По вопросам участия в проектах обращайтесь к нам по электронной почте или телефону.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Добавляем кликабельность для карточек других проектов
+    const otherCards = document.querySelectorAll('.other-project-card');
+    otherCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const url = card.getAttribute('onclick').match(/'(.*?)'/)[1];
+            window.location.href = url;
+        });
+    });
+</script>
+{% endblock %}
